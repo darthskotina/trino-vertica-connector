@@ -220,6 +220,7 @@ public class VerticaClient
         this.connectorExpressionRewriter = JdbcConnectorExpressionRewriterBuilder.newBuilder()
                 .addStandardRules(this::quoted)
                 // TODO allow all comparison operators for numeric types
+                // TODO add timestamp comparison with string
                 .add(new RewriteComparison(ImmutableSet.of(RewriteComparison.ComparisonOperator.EQUAL, RewriteComparison.ComparisonOperator.NOT_EQUAL)))
                 .add(new RewriteIn())
                 .withTypeClass("integer_type", ImmutableSet.of("tinyint", "smallint", "integer", "bigint"))
@@ -237,6 +238,9 @@ public class VerticaClient
                 .map("$is_null(value)").to("value IS NULL")
                 .map("$nullif(first, second)").to("NULLIF(first, second)")
                 .map("$less_than(left: numeric_type, right: numeric_type)").to("left < right")
+                .map("$equal(left: date, right: varchar)").to("left = right")
+                .map("$less_than(left: date, right: varchar)").to("left < right")
+                .map("$more_than(left: date, right: varchar)").to("left > right")
                 .build();
 
         JdbcTypeHandle bigintTypeHandle = new JdbcTypeHandle(Types.BIGINT, Optional.of("bigint"), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty());
@@ -308,9 +312,11 @@ public class VerticaClient
             case Types.CHAR:
                 return Optional.of(charColumnMapping(typeHandle.getRequiredColumnSize()));
 
+            case Types.LONGVARCHAR:
             case Types.VARCHAR:
                 return Optional.of(varcharColumnMapping(typeHandle.getRequiredColumnSize()));
 
+            case Types.LONGVARBINARY:
             case Types.BINARY:
             case Types.VARBINARY:
                 return Optional.of(varbinaryColumnMapping());
