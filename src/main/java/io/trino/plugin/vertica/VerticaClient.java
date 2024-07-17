@@ -152,6 +152,7 @@ import static io.trino.plugin.jdbc.StandardColumnMappings.varcharReadFunction;
 import static io.trino.plugin.jdbc.StandardColumnMappings.varcharWriteFunction;
 import static io.trino.plugin.jdbc.TypeHandlingJdbcSessionProperties.getUnsupportedTypeHandling;
 import static io.trino.plugin.jdbc.UnsupportedTypeHandling.CONVERT_TO_VARCHAR;
+import static io.trino.plugin.vertica.VerticaSessionProperties.isEnableConvertDecimalToVarchar;
 import static io.trino.spi.StandardErrorCode.NOT_SUPPORTED;
 import static io.trino.spi.type.BigintType.BIGINT;
 import static io.trino.spi.type.BooleanType.BOOLEAN;
@@ -194,6 +195,7 @@ public class VerticaClient
     private static final Logger log = Logger.get(VerticaClient.class);
     private static final int ARRAY_RESULT_SET_VALUE_COLUMN = 2;
     private static final int POSTGRESQL_MAX_SUPPORTED_TIMESTAMP_PRECISION = 6;
+    private static final int TRINO_MAX_DECIMAL_PRECISION = 37;
     private final Type uuidType;
     private final List<String> tableTypes;
     private final boolean statisticsEnabled;
@@ -203,6 +205,7 @@ public class VerticaClient
     @Inject
     public VerticaClient(
             BaseJdbcConfig config,
+            //VerticaConfig verticaConfig,
             JdbcStatisticsConfig statisticsConfig,
             ConnectionFactory connectionFactory,
             QueryBuilder queryBuilder,
@@ -218,6 +221,7 @@ public class VerticaClient
         log.info("statisticsEnabled:" + this.statisticsEnabled);
         this.uuidType = typeManager.getType(new TypeSignature(StandardTypes.UUID));
 
+//        Predicate<ConnectorSession> convertDecimalToVarcharEnabled = VerticaSessionProperties::isEnableConvertDecimalToVarchar;
         this.connectorExpressionRewriter = JdbcConnectorExpressionRewriterBuilder.newBuilder()
                 .addStandardRules(this::quoted)
                 // TODO allow all comparison operators for numeric types
@@ -301,12 +305,18 @@ public class VerticaClient
             case Types.NUMERIC:
             case Types.DECIMAL:
             {
-                // example: typeHandle(1):JdbcTypeHandle{jdbcType=2, jdbcTypeName=Numeric, columnSize=18, decimalDigits=8}
                 int columnSize = typeHandle.requiredColumnSize();
                 int precision;
                 int decimalDigits = typeHandle.decimalDigits().orElse(0);
                 precision = columnSize + max(-decimalDigits, 0); // Map decimal(p, -s) (negative scale) to decimal(p+s, 0).
                 log.info("decimal type (" + precision + "," + max(decimalDigits, 0) + ")");
+                if (precision > TRINO_MAX_DECIMAL_PRECISION) {
+                    if (isEnableConvertDecimalToVarchar(session) == true) {
+                        return mapToUnboundedVarchar(typeHandle);
+                    }
+                    return Optional.of(doubleColumnMapping());
+                }
+
                 return Optional.of(decimalColumnMapping(createDecimalType(precision, max(decimalDigits, 0)), UNNECESSARY));
             }
 

@@ -18,6 +18,7 @@ import com.google.inject.Provides;
 import com.google.inject.Scopes;
 import com.google.inject.Singleton;
 import io.airlift.configuration.AbstractConfigurationAwareModule;
+import io.airlift.configuration.ConfigBinder;
 import io.opentelemetry.api.OpenTelemetry;
 import io.trino.plugin.jdbc.BaseJdbcConfig;
 import io.trino.plugin.jdbc.ConnectionFactory;
@@ -32,6 +33,7 @@ import java.sql.SQLException;
 import java.util.Properties;
 
 import static io.airlift.configuration.ConfigBinder.configBinder;
+import static io.trino.plugin.jdbc.JdbcModule.bindSessionPropertiesProvider;
 
 public class VerticaClientModule
         extends AbstractConfigurationAwareModule
@@ -39,6 +41,8 @@ public class VerticaClientModule
     @Override
     public void setup(Binder binder)
     {
+        ConfigBinder.configBinder(binder).bindConfig(VerticaConfig.class);
+        bindSessionPropertiesProvider(binder, VerticaSessionProperties.class);
         binder.bind(JdbcClient.class).annotatedWith(ForBaseJdbc.class).to(VerticaClient.class).in(Scopes.SINGLETON);
         configBinder(binder).bindConfig(JdbcStatisticsConfig.class);
     }
