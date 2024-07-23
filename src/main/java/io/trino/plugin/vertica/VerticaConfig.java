@@ -23,7 +23,7 @@ public class VerticaConfig
 {
     private ArrayMapping arrayMapping = ArrayMapping.DISABLED;
     private boolean includeSystemTables;
-    private boolean enableConvertDecimalToVarchar;
+    private boolean enableConvertDecimalToVarchar = true;
 
     public enum ArrayMapping
     {

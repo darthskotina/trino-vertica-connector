@@ -310,7 +310,7 @@ public class VerticaClient
                 int decimalDigits = typeHandle.decimalDigits().orElse(0);
                 precision = columnSize + max(-decimalDigits, 0); // Map decimal(p, -s) (negative scale) to decimal(p+s, 0).
                 log.info("decimal type (" + precision + "," + max(decimalDigits, 0) + ")");
-                if (precision > TRINO_MAX_DECIMAL_PRECISION) {
+                if (precision > TRINO_MAX_DECIMAL_PRECISION || precision <= 0) {
                     if (isEnableConvertDecimalToVarchar(session) == true) {
                         return mapToUnboundedVarchar(typeHandle);
                     }
