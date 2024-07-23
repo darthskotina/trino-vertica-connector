@@ -63,6 +63,16 @@ public class TestVerticaQueries
     }
 
     @Test
+    public void viewTesting()
+    {
+        assertQuery("SELECT count(*) FROM vertica.trino.v_precision_1000", "VALUES 1");
+        assertQuery("SELECT count(*) FROM vertica.trino.v_precision", "VALUES 1");
+        assertQuery("SELECT amount FROM vertica.trino.v_precision_1000", "VALUES 9999999999999999999999999999999999999999999999999999999999999999999999999999999999999999.9999999999999999999999999999999999999999999999999999999999999999999999999999999999999999");
+        assertQuery("SELECT amount FROM vertica.trino.v_precision_1000 where amount > 1000", "VALUES 9999999999999999999999999999999999999999999999999999999999999999999999999999999999999999.9999999999999999999999999999999999999999999999999999999999999999999999999999999999999999");
+        assertQuery("SELECT count(*) FROM vertica.trino.v_precision_1000 where amount <= 1000", "VALUES 0");
+    }
+
+    @Test
     public void selectFromTable()
     {
         assertQuery("SELECT DISTINCT v FROM vertica.trino.test", "VALUES 'Vertica', 'Trino'");

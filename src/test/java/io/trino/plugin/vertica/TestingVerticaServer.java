@@ -62,12 +62,13 @@ public class TestingVerticaServer
         execute("CREATE SCHEMA IF NOT EXISTS trino;");
         execute("CREATE TABLE trino.test (i int,f float,d date,ts timestamp,v varchar(80)\n);");
         execute("CREATE TABLE trino.precision_1000 (id int, amount  NUMERIC(1000,200));");
-        execute("CREATE TABLE trino.precision (id int, amount  NUMERIC);");
+        execute("CREATE TABLE trino.precision (id int, amount  NUMERIC(37, 15));");
         execute("CREATE TABLE trino.varbinary (id int, amount  VARBINARY(9999));");
 
         execute("INSERT INTO trino.precision_1000 (id, amount) VALUES (1, 9999999999999999999999999999999999999999999999999999999999999999999999999999999999999999.9999999999999999999999999999999999999999999999999999999999999999999999999999999999999999);");
         execute("INSERT INTO trino.precision (id, amount) VALUES (1, 999.999);");
-
+        execute("CREATE VIEW trino.v_precision_1000 AS SELECT * FROM trino.precision_1000;");
+        execute("CREATE VIEW trino.v_precision AS SELECT * FROM trino.precision;");
         execute("INSERT INTO trino.varbinary (id, amount) VALUES (1, 'abababababababababababa'::VARBINARY);");
 
         execute("INSERT INTO trino.test VALUES (1,1.23,current_date,current_timestamp,'Trino');");
