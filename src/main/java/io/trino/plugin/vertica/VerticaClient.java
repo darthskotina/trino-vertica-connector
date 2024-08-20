@@ -195,7 +195,7 @@ public class VerticaClient
     private static final Logger log = Logger.get(VerticaClient.class);
     private static final int ARRAY_RESULT_SET_VALUE_COLUMN = 2;
     private static final int POSTGRESQL_MAX_SUPPORTED_TIMESTAMP_PRECISION = 6;
-    private static final int TRINO_MAX_DECIMAL_PRECISION = 37;
+    private static final int TRINO_MAX_DECIMAL_PRECISION = 38;
     private final Type uuidType;
     private final List<String> tableTypes;
     private final boolean statisticsEnabled;
