@@ -48,6 +48,13 @@ public class TestVerticaQueries
     }
 
     @Test
+    public void directQuery()
+    {
+        assertQuerySucceeds("create table vertica.trino.test3 (a int, b date, c varchar)");
+        assertQuery("SELECT * FROM TABLE(vertica.system.query( query => 'SELECT count(*) FROM trino.test3'))", "VALUES '0'");
+    }
+
+    @Test
     public void typeTesting()
     {
         assertQuerySucceeds("create table vertica.trino.sometypes (d1 decimal(18,8), d2 decimal(12))");
