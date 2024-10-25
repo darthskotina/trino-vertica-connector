@@ -6,10 +6,10 @@ The ogirinal version builds just fine for Trino versions up to 431.
 
 ###
 Differences from the orignal
--Supports Trino 432+
--Supports numeric types with precision higher than 37 (with conversion to varchar or double, depending on the enable_convert_decimal_to_varchar handle)
--Supports a direct query execution (SELECT * FROM TABLE(vertica.system.query( query => 'select * from vertica_schema.vertica_table')))
--vertica image switched to opentext for tests
+*Supports Trino 432+
+*Supports numeric types with precision higher than 37 (with conversion to varchar or double, depending on the enable_convert_decimal_to_varchar handle)
+*Supports a direct query execution (SELECT * FROM TABLE(vertica.system.query( query => 'select * from vertica_schema.vertica_table')))
+*vertica image switched to opentext for tests
 
 ### How to install
 
