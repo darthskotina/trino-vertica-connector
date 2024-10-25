@@ -2,20 +2,24 @@
 Trino JDBC connector to Vertica
 
 This project is based on trino-vertica by bryanherger. You can find the original project here: https://github.com/bryanherger/trino-vertica.
-The original was targeting Trino 425, but builds just fine for Trino 431 with just a version change in pom.xml,
-but is broken for Trino 448.
+The ogirinal version builds just fine for Trino versions up to 431.
 
-This version updates the connector for Trino 450 and beyond
+###
+Differences from the orignal
+-Supports Trino 432+
+-Supports numeric types with precision higher than 37 (with conversion to varchar or double, depending on the enable_convert_decimal_to_varchar handle)
+-Supports a direct query execution (SELECT * FROM TABLE(vertica.system.query( query => 'select * from vertica_schema.vertica_table')))
+-vertica image switched to opentext for tests
 
 ### How to install
 
-The master branch of this connector works with Trino release version 450.  Tags and binary releases exist for several older branches.
+The master branch of this connector works with Trino release version **462**.  Tags and binary releases exist for several older branches.
 
 INSTALL FROM BINARY RELEASE: Download the ZIP and unzip in your Trino plugins directory.  Rename the directory to "vertica".  Create a catalog  file as shown below.  Restart Trino.
 
 INSTALL FROM GITHUB SOURCE:
 
-Download and unpack the Trino 450 tag from the official GitHub.
+Download and unpack the selected Trino tag from the official GitHub.
 
 Clone or download this repo and copy trino-vertica into the plugins directory
 
